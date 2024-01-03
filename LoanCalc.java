@@ -3,7 +3,7 @@
 */
 public class LoanCalc {
 	
-	static double epsilon = 0.001;  // The computation tolerance (estimation error)
+	static double epsilon = 0.00001;  // The computation tolerance (estimation error)
 	static int iterationCounter;    // Monitors the efficiency of the calculation
 	
     /** 
@@ -17,12 +17,15 @@ public class LoanCalc {
 		double rate = Double.parseDouble(args[1]);
 		int n = Integer.parseInt(args[2]);
 		System.out.println("Loan sum = " + loan + ", interest rate = " + rate + "%, periods = " + n);
+
 		
 		// Computes the periodical payment using brute force search
 		System.out.print("Periodical payment, using brute force: ");
 		System.out.printf("%.2f", bruteForceSolver(loan, rate, n, epsilon));
 		System.out.println();
 		System.out.println("number of iterations: " + iterationCounter);
+
+		iterationCounter = 0;
 
 		// Computes the periodical payment using bisection search
 		System.out.print("Periodical payment, using bi-section search: ");
@@ -39,8 +42,15 @@ public class LoanCalc {
 	*/
 	// Side effect: modifies the class variable iterationCounter.
     public static double bruteForceSolver(double loan, double rate, int n, double epsilon) {  
-    	// Replace the following statement with your code
-    	return 0;
+    	double g = loan / n;
+		double increment = 0.1;
+		double f = endBalance(loan, rate, n, g);
+		while (f >= epsilon && f >= 0) {
+			g += increment;
+			iterationCounter++;
+			f = endBalance(loan, rate, n, g);
+		}
+    	return g;
     }
     
     /**
@@ -51,8 +61,21 @@ public class LoanCalc {
 	*/
 	// Side effect: modifies the class variable iterationCounter.
     public static double bisectionSolver(double loan, double rate, int n, double epsilon) {  
-    	// Replace the following statement with your code
-    	return 0;
+    	double H = loan;
+		double L = loan / n;
+		double g = (L + H) / 2;
+		while ((H - L) > epsilon) {
+			if (endBalance(loan, rate, n, g) > 0) {
+				L = g;
+				g = (L + H) / 2;
+			}
+			else {
+				H = g;
+				g = (L + H) / 2;
+			}
+			iterationCounter++;
+		}
+    	return g;
     }
 	
 	/**
@@ -60,7 +83,9 @@ public class LoanCalc {
 	* interest rate (as a percentage), the number of periods (n), and the periodical payment.
 	*/
 	private static double endBalance(double loan, double rate, int n, double payment) {
-		// Replace the following statement with your code
-    	return 0;
+		for (int i = 1; i < n; i++) {
+			loan = (loan - payment) * (1 + 0.01 * rate); // TODO: maybe change
+		}
+    	return loan;
 	}
 }
